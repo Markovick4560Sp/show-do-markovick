@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Show do Markovick</title>
+<meta name="description" content="69 perguntas sobre o Markovick. Quanto você me conhece?">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Show do Markovick">
+<meta property="og:description" content="69 perguntas sobre o Markovick. Quanto você me conhece?">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23000'/%3E%3Ctext x='50' y='72' font-size='66' font-weight='900' text-anchor='middle' fill='%23fff' font-family='Arial'%3EM%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#000; --txt:#e7e9ea; --cinza:#71767b; --borda:#2f3336; --hover:#16181c;
+    --azul:#1d9bf0; --verde:#00ba7c; --rosa:#f91880; --card:#16181c;
+    --topo:rgba(0,0,0,.65); --busca:#202327; --fill:#333639;
+  }
+  html[data-tema="claro"]{
+    --bg:#fff; --txt:#0f1419; --cinza:#536471; --borda:#eff3f4; --hover:#f7f9f9;
+    --card:#f7f9f9; --topo:rgba(255,255,255,.85); --busca:#eff3f4; --fill:#e1e8ed;
+  }
+  body,.topo,.barraMob,.caixa{transition:background .25s,color .25s}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{overflow-x:hidden;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.35;min-height:100vh}
+  button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+  .cinza{color:var(--cinza)} .azul{color:var(--azul)} .peq{font-size:13px}
+  svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .tela{display:none} .tela.ativa{display:block}
+
+  .marca{font-weight:900;font-size:30px;letter-spacing:-1px;line-height:1}
+  .pill{border-radius:999px;font-weight:700;padding:12px 28px;font-size:16px;transition:background .15s}
+  .pill.branca{background:var(--txt);color:var(--bg)}
+  .pill.branca:hover{opacity:.88}
+  .pill.azulb{background:var(--azul);color:#fff}
+  .pill.azulb:hover{background:#1a8cd8}
+  .pill.contorno{border:1px solid #536471;color:var(--txt)}
+  .pill.contorno:hover{background:var(--hover)}
+
+  /* ---------- INÍCIO (estilo tela de entrada) ---------- */
+  .inicio{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:40px}
+  .inicio .grande{font-size:min(40vw,380px);font-weight:900;text-align:center;letter-spacing:-20px;line-height:.8}
+  .inicio h1{font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-1.5px;margin-bottom:36px;line-height:1.05}
+  .inicio h2{font-size:clamp(22px,3vw,31px);font-weight:800;margin-bottom:12px}
+  .inicio p{margin-bottom:24px;max-width:380px}
+  .inicio .pill{width:300px;max-width:100%}
+  .inicio small{display:block;margin-top:12px;max-width:300px;font-size:11px}
+
+  /* ---------- APP ---------- */
+  .app{display:grid;grid-template-columns:260px 600px 350px;justify-content:center;min-height:100vh}
+  .nav{position:sticky;top:0;height:100vh;padding:8px 12px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+  .nav .marca{padding:12px}
+  .nav a{display:flex;align-items:center;gap:18px;padding:12px;border-radius:999px;font-size:20px;color:var(--txt);text-decoration:none}
+  .nav a:hover{background:var(--hover)}
+  .nav a.on{font-weight:800}
+  .nav svg{width:26px;height:26px}
+  .nav .pill{width:90%;margin-top:14px;font-size:17px;padding:15px}
+
+  .centro{border-left:1px solid var(--borda);border-right:1px solid var(--borda);min-height:100vh;padding-bottom:90px}
+  .topo{position:sticky;top:0;z-index:5;background:var(--topo);backdrop-filter:blur(12px);border-bottom:1px solid var(--borda)}
+  .topoMob{display:none;justify-content:space-between;align-items:center;padding:10px 16px}
+  .abas{display:flex;position:relative}
+  .aba{flex:1;text-align:center;padding:16px 0;font-weight:500;color:var(--cinza)}
+  .aba.on{color:var(--txt);font-weight:700}
+  .aba.on span{position:relative}
+  .aba.on span::after{content:"";position:absolute;left:0;right:0;bottom:-16px;height:4px;border-radius:4px;background:var(--azul)}
+  .ctrls{position:absolute;right:8px;top:8px;display:flex;gap:2px;z-index:2}
+  .bt{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .bt:hover{background:var(--hover)}
+  .temaInicio{position:fixed;top:14px;right:14px;z-index:5}
+  .prog{height:3px;background:var(--borda)} .prog i{display:block;height:100%;width:0;background:var(--azul);transition:width .4s}
+  .status{padding:10px 16px;border-bottom:1px solid var(--borda);font-size:13px}
+
+  .post{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--borda)}
+  .av{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;background:linear-gradient(135deg,#1d9bf0,#7856ff)}
+  .av.a0{background:linear-gradient(135deg,#f91880,#ff7a00)} .av.a1{background:linear-gradient(135deg,#00ba7c,#1d9bf0)}
+  .corpo{flex:1;min-width:0}
+  .cab{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+  .cab b{font-weight:700}
+  .selo{width:18px;height:18px;stroke:none}
+  .texto{font-size:17px;margin:4px 0 12px;white-space:pre-wrap;word-wrap:break-word}
+
+  /* enquete */
+  .enquete{display:flex;flex-direction:column;gap:8px;position:relative}
+  .opc{position:relative;overflow:hidden;width:100%;min-height:36px;padding:8px 14px;border:1px solid var(--azul);border-radius:6px;color:var(--azul);font-weight:700;font-size:15px;text-align:center;transition:background .15s,transform .25s ease-out}
+  .opc:hover{background:rgba(29,155,240,.1)}
+  .opc .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--fill);border-radius:4px;transition:width .8s ease-out;z-index:0}
+  .opc .rot,.opc .pct{position:relative;z-index:1}
+  .opc .pct{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+  .opc.marcada{background:rgba(29,155,240,.18)}
+  .opc.res{border-color:transparent;color:var(--txt);text-align:left;font-weight:400;cursor:default}
+  .opc.res:hover{background:none}
+  .opc.res.certa{font-weight:700}
+  .opc.res.certa .fill{background:rgba(29,155,240,.55)}
+  .opc.res.errada .fill{background:rgba(249,24,128,.5)}
+  .opc.res.certa .rot::after{content:"  ✓"}
+  .opc.res.errada .rot::after{content:"  ✗"}
+  .opc.sumiu{opacity:.15;pointer-events:none;text-decoration:line-through}
+  .travado .opc{pointer-events:none}
+  .infoVotos{margin-top:12px}
+
+  .acoes{display:flex;justify-content:space-between;margin-top:12px;max-width:440px}
+  .acao{display:flex;align-items:center;gap:4px;color:var(--cinza);font-size:13px;border-radius:999px;padding:4px 8px 4px 4px;transition:color .15s,background .15s}
+  .acao svg{width:20px;height:20px}
+  .acao em{font-style:normal}
+  .acao.r:hover{color:var(--azul);background:rgba(29,155,240,.1)}
+  .acao.p:hover{color:var(--verde);background:rgba(0,186,124,.1)}
+  .acao.c:hover{color:#ffd400;background:rgba(255,212,0,.1)}
+  .acao.usada{opacity:.3;pointer-events:none}
+  .acao.like{color:var(--rosa);pointer-events:none}
+  .acao.like svg{fill:var(--rosa)}
+  .acao.like.pulo{animation:pulo .5s}
+  @keyframes pulo{40%{transform:scale(1.35)}}
+
+  .reply{animation:surgir .35s ease-out backwards}
+  .reply .texto{font-size:15px;margin:2px 0 0}
+  @keyframes surgir{from{opacity:0;transform:translateY(-8px)}}
+
+  .proxWrap{padding:16px;display:flex;justify-content:flex-end;border-bottom:1px solid var(--borda)}
+  #proxima[hidden]{display:none}
+
+  /* lateral direita */
+  .dir{padding:12px 24px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:16px}
+  .busca{background:var(--busca);border-radius:999px;padding:12px 18px;color:var(--cinza);display:flex;gap:10px;align-items:center}
+  .busca svg{width:18px;height:18px}
+  .card{border:1px solid var(--borda);border-radius:16px;overflow:hidden}
+  .card h3{font-size:20px;font-weight:800;padding:12px 16px}
+  .card .item{padding:12px 16px}
+  .card .item:hover{background:var(--hover)}
+  .card .num{font-size:26px;font-weight:800}
+
+  /* barra mobile */
+  .barraMob{display:none;position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--bg);border-top:1px solid var(--borda);padding:10px 20px;justify-content:space-around;font-weight:700}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,40px);opacity:0;z-index:30;background:var(--azul);color:#fff;font-weight:700;padding:12px 20px;border-radius:6px;transition:all .25s;pointer-events:none;white-space:nowrap}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.erro{background:var(--rosa)}
+
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:20;background:rgba(91,112,131,.4);display:none;align-items:center;justify-content:center;padding:20px}
+  .modal.ativa{display:flex}
+  .caixa{background:var(--bg);border-radius:16px;padding:32px;max-width:320px;width:100%;animation:surgir .2s ease-out}
+  .caixa h2{font-size:20px;font-weight:800;margin-bottom:8px}
+  .caixa p{color:var(--cinza);margin-bottom:24px}
+  .caixa .pill{width:100%;margin-bottom:12px}
+
+  /* fim (estilo perfil) */
+  .banner{height:200px;background:linear-gradient(135deg,#1d9bf0,#7856ff 60%,#f91880)}
+  .perfil{padding:12px 16px;border-bottom:1px solid var(--borda);position:relative}
+  .perfil .avG{width:134px;height:134px;border-radius:50%;border:4px solid var(--bg);margin-top:-80px;display:flex;align-items:center;justify-content:center;font-size:60px;background:linear-gradient(135deg,#ffd400,#ff7a00)}
+  .perfil .pill{position:absolute;right:16px;top:12px;padding:8px 18px;font-size:15px}
+  .perfil h1{font-size:20px;font-weight:800;margin-top:10px}
+  .perfil .stats{display:flex;gap:18px;margin-top:12px}
+  .perfil .stats b{color:var(--txt)}
+  .fixado{font-size:13px;color:var(--cinza);font-weight:700;padding:12px 16px 0 68px}
+
+  .confete{position:fixed;top:-20px;width:8px;height:14px;z-index:15;pointer-events:none;animation:cair linear forwards}
+  @keyframes cair{to{transform:translateY(110vh) rotate(720deg)}}
+
+  @media (max-width:1250px){ .app{grid-template-columns:88px 600px 350px} .nav a span,.nav .pill{display:none} }
+  @media (max-width:1060px){ .app{grid-template-columns:88px minmax(0,600px)} .dir{display:none} }
+  @media (min-width:701px){ .abas{padding-right:84px} }
+  @media (max-width:700px){
+    .app{grid-template-columns:minmax(0,1fr)} .nav{display:none}
+    .acao em{display:none}
+    .centro{border:none;padding-bottom:110px}
+    .topoMob{display:flex;justify-content:flex-start;gap:14px;padding:12px 96px 6px 16px;min-height:52px}
+    .mobInfo{font-size:13px;color:var(--cinza);font-weight:600}
+    .aba{padding:12px 0}
+    .aba.on span::after{bottom:-12px}
+    .status{display:none}
+    .post{padding:12px 14px;gap:10px}
+    .texto{font-size:18px}
+    .opc{min-height:46px;font-size:16px;padding:10px 14px}
+    .enquete{gap:10px}
+    .acoes{max-width:none}
+    .proxWrap{position:fixed;left:0;right:0;bottom:46px;z-index:6;border:none;padding:10px 14px;background:linear-gradient(transparent,var(--bg) 35%)}
+    .proxWrap:has(#proxima[hidden]){display:none}
+    #proxima{width:100%;padding:14px}
+    .barraMob{padding:12px 20px calc(12px + env(safe-area-inset-bottom))}
+    .toast{bottom:auto;top:16px;transform:translate(-50%,-40px)}
+    .toast.show{transform:translate(-50%,0)}
+    .caixa{padding:24px}
+    .barraMob{display:flex}
+    .inicio{grid-template-columns:1fr;padding:28px;align-content:center}
+    .inicio .grande{font-size:64px;text-align:left;letter-spacing:-2px;margin-bottom:40px}
+    .banner{height:130px}
+    .perfil .avG{width:90px;height:90px;font-size:40px;margin-top:-56px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= INÍCIO ================= -->
+<section class="tela ativa" id="telaInicio">
+  <button class="bt btTema temaInicio" title="Modo claro/escuro"></button>
+  <div class="inicio">
+    <div class="grande">M</div>
+    <div>
+      <h1>Acontecendo agora</h1>
+      <h2>Show do Markovick</h2>
+      <p class="cinza">69 posts sobre o Markovick. Cada voto certo vale pontos, e a última vale 1 milhão.</p>
+      <button class="pill branca" id="btnComecar">Começar</button>
+      <small class="cinza">Ao começar, você concorda em responder com toda sinceridade 😏</small>
+    </div>
+  </div>
+</section>
+
+<!-- ================= JOGO ================= -->
+<section class="tela" id="telaJogo">
+  <div class="app">
+    <nav class="nav">
+      <div class="marca">M</div>
+      <a class="on" href="#"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Página inicial</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Explorar</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg><span>Notificações</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>Mensagens</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Perfil</span></a>
+      <button class="pill azulb" id="navProx" style="display:none">Próximo post</button>
+    </nav>
+
+    <main class="centro">
+      <div class="topo">
+        <div class="ctrls">
+          <button class="bt btTema" title="Modo claro/escuro"></button>
+          <button class="bt" id="som" title="Som"><svg viewBox="0 0 24 24" id="icSom"><path d="M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6"/></svg></button>
+        </div>
+        <div class="topoMob"><div class="marca" style="font-size:26px">M</div><div class="mobInfo" id="mobInfo"></div></div>
+        <div class="abas">
+          <div class="aba on"><span>Para você</span></div>
+          <div class="aba"><span>Seguindo</span></div>
+        </div>
+      </div>
+      <div class="prog"><i id="barraProg"></i></div>
+      <div class="status cinza" id="status"></div>
+
+      <article class="post">
+        <div class="av">M</div>
+        <div class="corpo">
+          <div class="cab">
+            <b>Markovick</b>
+            <svg class="selo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1d9bf0"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#fff" stroke-width="2.4" fill="none"/></svg>
+            <span class="cinza">@markovick · agora</span>
+          </div>
+          <div class="texto" id="texto"></div>
+          <div class="enquete" id="enquete"></div>
+          <div class="infoVotos cinza" id="infoVotos"></div>
+          <div class="acoes">
+            <button class="acao r" id="ajAmigas" title="Perguntar às amigas"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H10l-6 4z"/></svg><em>Amigas</em>&nbsp;<span></span></button>
+            <button class="acao p" id="ajPular" title="Pular"><svg viewBox="0 0 24 24"><path d="M4 12V9a2 2 0 0 1 2-2h12l-3-3M20 12v3a2 2 0 0 1-2 2H6l3 3"/></svg><em>Pular</em>&nbsp;<span></span></button>
+            <button class="acao c" id="ajCartas" title="Eliminar 2 erradas"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 7.5 20 19M8.5 16.5 20 5"/></svg><em>Cortar 2</em>&nbsp;<span></span></button>
+            <span class="acao like" id="like"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span id="likeN">0</span></span>
+          </div>
+        </div>
+      </article>
+
+      <div id="replies"></div>
+      <div class="proxWrap"><button class="pill branca" id="proxima" hidden>Próximo post</button></div>
+    </main>
+
+    <aside class="dir">
+      <div class="busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Buscar</div>
+      <div class="card">
+        <h3>Seu placar</h3>
+        <div class="item"><div class="cinza peq">Pontos</div><div class="num" id="placarPts">0</div></div>
+        <div class="item"><div class="cinza peq">Acertos</div><div class="num" id="placarAc">0</div></div>
+      </div>
+      <div class="card">
+        <h3>O que está acontecendo</h3>
+        <div class="item"><div class="cinza peq">Assunto do Momento</div><b>#ShowDoMarkovick</b><div class="cinza peq">69 posts</div></div>
+        <div class="item"><div class="cinza peq">Games · Em alta</div><b>GTA 6</b><div class="cinza peq">Aguardando lançamento</div></div>
+        <div class="item"><div class="cinza peq">São Pedro · Em alta</div><b>Mandioca</b><div class="cinza peq">12,5 mil posts</div></div>
+        <div class="item"><div class="cinza peq">Educação · Em alta</div><b>Aula de inglês no Zoom</b><div class="cinza peq">1 participante muito dedicado</div></div>
+      </div>
+    </aside>
+  </div>
+  <div class="barraMob"><span>❤️ <span id="mobPts">0</span> pts</span><span>✓ <span id="mobAc">0</span> acertos</span></div>
+</section>
+
+<!-- ================= FIM ================= -->
+<section class="tela" id="telaFim">
+  <div class="app">
+    <nav class="nav"><div class="marca">M</div></nav>
+    <main class="centro">
+      <div class="banner"></div>
+      <div class="perfil">
+        <div class="avG">🏆</div>
+        <button class="pill contorno" id="btnDeNovo">Jogar de novo</button>
+        <h1 id="tituloFim"></h1>
+        <div class="cinza">@showdomarkovick</div>
+        <div class="stats cinza">
+          <span><b id="ptsFim">0</b> pontos</span>
+          <span><b id="acFim">0</b> de <b id="totFim">69</b> acertos</span>
+        </div>
+      </div>
+      <div class="fixado">📌 Post fixado</div>
+      <article class="post" style="border-bottom:none">
+        <div class="av">M</div>
+        <div class="corpo">
+          <div class="cab"><b>Markovick</b>
+            <svg class="selo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1d9bf0"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#fff" stroke-width="2.4" fill="none"/></svg>
+            <span class="cinza">@markovick · agora</span></div>
+          <div class="texto" id="mensagemFim"></div>
+        </div>
+      </article>
+    </main>
+  </div>
+</section>
+
+<div class="modal" id="modal"><div class="caixa" id="caixa"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   EDITE AQUI: perguntas, ajudas e mensagem final
+   certa = índice da resposta certa (0=A, 1=B, 2=C, 3=D, 4=E)
+   foge  = índice (ou lista) das opções que fogem do clique
+   Os pontos são gerados sozinhos, terminando em 1 milhão.
+   ========================================================= */
+const PERGUNTAS = [
+  /* 1 */ { p:"Quantos anos o Markovick tem?",
+    r:["27","29","31","35"], certa:2 },
+  /* 2 */ { p:"Qual é a profissão do Markovick?",
+    r:["Coach quântico","Edição de vídeo para criadores de conteúdo","Vendedor de curso de day trade","Influencer de dancinha"], certa:1 },
+  /* 3 */ { p:"Que instrumento o Markovick toca?",
+    r:["Pandeiro","Flauta doce","Triângulo","Guitarra elétrica"], certa:3 },
+  /* 4 */ { p:"Qual estilo musical o Markovick mais ama?",
+    r:["Sertanejo universitário","Funk","Heavy metal","Pagode"], certa:2 },
+  /* 5 */ { p:"De qual cidade o Markovick veio?",
+    r:["São Paulo","São Luís do Maranhão","Fortaleza","Belém"], certa:1 },
+  /* 6 */ { p:"Qual é o maior pesadelo de um editor de vídeo?",
+    r:["Barata voadora","O programa fechar sem salvar","Cliente pedindo \"só uma alteraçãozinha\"","As duas do meio, sem dúvida"], certa:3 },
+  /* 7 */ { p:"Qual tipo de mulher o Markovick gosta?",
+    r:["Loira, europeia e branca","Brasileira normal","Mulher com traços italianos","Traços japoneses"], certa:2 },
+  /* 8 */ { p:"Qual a altura ideal de mulher que o Markovick gosta?",
+    r:["1,75 m","1,68 m","1,62 m","1,57 m"], certa:3 },
+  /* 9 */ { p:"Para qual interior o Markovick gostaria de ir morar?",
+    r:["São Pedro","Piracicaba","Holambra","Campos do Jordão"], certa:0 },
+  /* 10 */ { p:"Qual é o objetivo do Markovick no interior, em São Pedro?",
+    r:["Ter uma vida mais tranquila","Ter mais segurança","Custo de vida mais baixo","Plantar muita mandioca no interior"], certa:3 },
+  /* 11 */ { p:"O que o Markovick quer aprofundar nos próximos anos?",
+    r:["Astrologia","Orquestrador de IA","Crochê","Ser DJ de forró"], certa:1 },
+  /* 12 */ { p:"Qual programa o Markovick mais usa no trabalho?",
+    r:["Paint","After Effects","PowerPoint","Bloco de Notas"], certa:1 },
+  /* 13 */ { p:"Qual a melhor forma de conquistar o Markovick?",
+    r:["Dizer que ele é bonito","Dizer que ele é engraçado","Dizer que ele é inteligente","Todas as anteriores"], certa:3 },
+  /* 14 */ { p:"No After Effects, o que o Markovick mais gosta de fazer?",
+    r:["Deixar tudo no automático","Encaixar perfeitamente cada pecinha","Fechar sem salvar","Usar só preset pronto"], certa:1 },
+  /* 15 */ { p:"Qual a parte favorita do Markovick em tocar guitarra?",
+    r:["Afinar","Trocar as cordas","Fazer a guitarra chorar a noite toda","Guardar no case"], certa:2 },
+  /* 16 */ { p:"Quanto tempo dura um vídeo bem editado pelo Markovick?",
+    r:["Uma rapidinha, 1:30 a 3 minutos","O tempo que for preciso, sem pressa","10 minutos","25 minutos bem editados"], certa:3 },
+  /* 17 */ { p:"Além de mandioca, o que mais o Markovick vai plantar em São Pedro?",
+    r:["Alface","Couve","Cebolinha","Banana, mas só da grande"], certa:3 },
+  /* 18 */ { p:"Qual o ritmo preferido do Markovick na guitarra?",
+    r:["Lento e romântico","Rápido e intenso","Começa devagar e vai acelerando","Sem ritmo nenhum"], certa:2 },
+  /* 19 */ { p:"Qual comando o Markovick mais usa na edição?",
+    r:["Ctrl + Z","Dar um zoom nos detalhes","Excluir tudo","Ctrl + C, Ctrl + V"], certa:1 },
+  /* 20 */ { p:"No interior, qual animal o Markovick vai criar?",
+    r:["Galinha","Peixe","Égua, pra cavalgar todo dia","Hamster"], certa:2 },
+  /* 21 */ { p:"Qual a posição preferida do Markovick... pra editar?",
+    r:["Sentado na cadeira gamer","Deitado na cama","Em pé","Todas as posições são boas"], certa:3 },
+  /* 22 */ { p:"Qual o maior talento escondido do Markovick?",
+    r:["Cozinhar","Trabalho manual com os dedos (na guitarra, claro)","Dançar forró","Cantar no chuveiro"], certa:1 },
+  /* 23 */ { p:"Qual o número da sorte do Markovick?",
+    r:["7","13","69","100"], certa:2 },
+  /* 24 */ { p:"Na fazenda em São Pedro, quem vai ordenhar a vaca?",
+    r:["O caseiro","O Markovick, com muita habilidade","Ninguém, vai comprar leite","A vizinha"], certa:1 },
+  /* 25 */ { p:"Qual é a altura do Markovick?",
+    r:["1,78 m","1,83 m","1,90 m","1,95 m"], certa:2 },
+  /* 26 */ { p:"Qual o tamanho ideal da timeline do Markovick?",
+    r:["Curtinha","Média","Bem longa, de preferência","Tamanho não importa"], certa:2 },
+  /* 27 */ { p:"Qual fruta o Markovick prefere chupar?",
+    r:["Laranja","Manga","Caju","Qualquer uma que tenha caldinho"], certa:3 },
+  /* 28 */ { p:"Na hora de jogar videogame, como o Markovick segura o controle?",
+    r:["Com uma mão só","Nem segura, usa teclado","Com as duas mãos e bastante firmeza","Deixa você segurar"], certa:2 },
+  /* 29 */ { p:"Em qual horário o Markovick gosta de trabalhar?",
+    r:["De manhã cedinho","Na hora do almoço","De madrugada","Qualquer horário é bom pra começar os trabalhos"], certa:3 },
+  /* 30 */ { p:"Quantas vezes por semana o Markovick toca guitarra?",
+    r:["Uma","Duas","Toda noite","Nunca"], certa:2 },
+  /* 31 */ { p:"Qual a palavra em inglês que o Markovick mais gosta?",
+    r:["Deadline","Render","Beautiful","Client"], certa:2 },
+  /* 32 */ { p:"O que nunca pode faltar numa boa edição?",
+    r:["Trilha sonora","Cortes rápidos","Química entre as partes","Legenda"], certa:2 },
+  /* 33 */ { p:"Qual parte da guitarra o Markovick mais gosta?",
+    r:["O braço","O corpo, cheio de curvas","As tarraxas","O cabo"], certa:1 },
+  /* 34 */ { p:"Se o Markovick fosse uma ferramenta do After Effects, seria...",
+    r:["A borracha","A caneta","A ferramenta de mão, que pega e arrasta","A de texto"], certa:2 },
+  /* 35 */ { p:"Na fazenda, o que o Markovick vai fazer no fim da tarde?",
+    r:["Ver o pôr do sol","Plantar mandioca","Assistir novela","Dormir cedo"], certa:1 },
+  /* 36 */ { p:"Como o Markovick fica antes da aula de inglês no Zoom?",
+    r:["Com preguiça","Ansioso, contando os minutos","Com sono","Querendo cancelar"], certa:1 },
+  /* 37 */ { p:"Qual frase em inglês o Markovick mais quer aprender a falar?",
+    r:["Where is the library?","The book is on the table","You make my day better","I need a refund"], certa:2 },
+  /* 38 */ { p:"Quanto tempo o Markovick leva pra renderizar?",
+    r:["2 minutos","Rapidinho","Bastante tempo, porque é trabalho bem feito","Nunca termina"], certa:2 },
+  /* 39 */ { p:"Qual o horário em que o Markovick fica mais inspirado?",
+    r:["8h","12h","Das 22h em diante","15h"], certa:2 },
+  /* 40 */ { p:"Qual sobremesa o Markovick não recusa?",
+    r:["Pudim","Sorvete de casquinha, bem lambido","Bolo","Gelatina"], certa:1 },
+  /* 41 */ { p:"Na guitarra, o Markovick prefere tocar com...",
+    r:["Palheta","Os dedos","Slide","Um dedo só"], certa:1 },
+  /* 42 */ { p:"O que o Markovick faz de melhor em um projeto?",
+    r:["Só o começo","Só o final","Só o meio","Todo o processo, do começo ao fim"], certa:3 },
+  /* 43 */ { p:"Qual temperatura o Markovick prefere?",
+    r:["Friozinho","Morno","Quente, bem quente","Ar-condicionado no 16"], certa:2 },
+  /* 44 */ { p:"Qual o melhor lugar da casa pro Markovick editar?",
+    r:["Escritório","Sala","Quarto","Todo lugar é maravilhoso pra editar"], certa:3 },
+  /* 45 */ { p:"Qual a melhor parte do dia do Markovick?",
+    r:["Acordar cedo","A hora do almoço","Quando chega aquela mensagem que ele tava esperando","A hora de dormir"], certa:2 },
+  /* 46 */ { p:"Qual dever de casa o Markovick nunca esquece de fazer?",
+    r:["Os exercícios de inglês","Lavar a louça","Responder cliente","Arrumar a cama"], certa:0 },
+  /* 47 */ { p:"Como o Markovick resolve um problema difícil?",
+    r:["Desiste","Vai com calma e insiste até resolver","Pede ajuda","Ignora"], certa:1 },
+  /* 48 */ { p:"Se o Markovick pudesse editar uma cena em câmera lenta, qual seria?",
+    r:["Gotas de chuva","Fogos de artifício","Um sorriso bonito","Carro derrapando"], certa:2 },
+  /* 49 */ { p:"Qual o volume ideal pro Markovick?",
+    r:["Baixinho","Médio","No máximo, pros vizinhos ouvirem","Mudo"], certa:2 },
+  /* 50 */ { p:"Em que ambiente o Markovick gosta de editar?",
+    r:["Luz apagada","Meia-luz","De luz acesa","Luz de vela"], certa:2 },
+  /* 51 */ { p:"No Guitar Hero, qual dificuldade o Markovick joga?",
+    r:["Fácil","Médio","Expert, a noite toda","Não joga"], certa:2 },
+  /* 52 */ { p:"O que o Markovick mais gosta de fazer depois de um dia cheio?",
+    r:["Dormir","Ver série","Uma massagem","Responder cliente"], certa:2 },
+  /* 53 */ { p:"Qual a melhor qualidade do Markovick?",
+    r:["Pontualidade","Resistência","Organização","Paciência"], certa:3 },
+  /* 54 */ { p:"Se o Markovick fosse um tempero, seria...",
+    r:["Sal","Açúcar","Pimenta","Orégano"], certa:2 },
+  /* 55 */ { p:"No interior, onde o Markovick vai tomar banho?",
+    r:["Chuveiro","Cachoeira, acompanhado","Piscina","Balde"], certa:1 },
+  /* 56 */ { p:"Qual a combinação perfeita, segundo o Markovick?",
+    r:["Arroz e feijão","Queijo e goiabada","1,90 m e 1,57 m","Café e pão"], certa:2 },
+  /* 57 */ { p:"Qual a especialidade do Markovick na cozinha?",
+    r:["Miojo","Ovo frito","Café da manhã na cama","Pedir iFood"], certa:2 },
+  /* 58 */ { p:"O que o Markovick mais repara numa pessoa?",
+    r:["O tênis","O sorriso e o jeito de falar","O signo","O modelo do celular"], certa:1 },
+  /* 59 */ { p:"Quanto tempo o Markovick aguenta jogando sem parar?",
+    r:["1 hora","3 horas","Entre 15 e 25 minutos sem parar","10 minutos"], certa:2 },
+  /* 60 */ { p:"Qual mania o Markovick tem?",
+    r:["Roer unha","Morder o lábio","Estalar os dedos","Mexer no cabelo"], certa:1 },
+  /* 61 */ { p:"Qual o lugar preferido do Markovick pra um passeio?",
+    r:["Shopping","Praia","Cinema, na última fileira","Parque"], certa:2 },
+  /* 62 */ { p:"Numa noite tranquila, o que o Markovick tocaria na guitarra?",
+    r:["Heavy metal no último volume","Uma balada lenta, pensando em alguém","O hino do time","Nada, ele tá cansado"], certa:1 },
+  /* 63 */ { p:"Qual o melhor Ctrl + S (salvar) da vida do Markovick?",
+    r:["Um projeto de cliente","As fotos de viagem","Algumas conversas que ele relê de vez em quando","O backup do HD"], certa:2 },
+  /* 64 */ { p:"Por que o Markovick nunca falta na aula de inglês?",
+    r:["Porque pagou adiantado","Porque quer ficar fluente","Porque a professora é a melhor parte do dia","Porque não tem nada pra fazer"], certa:2 },
+  /* 65 */ { p:"O que deixaria a casa em São Pedro perfeita?",
+    r:["Um Wi-Fi bom","Uma piscina","A companhia certa","Mais galinhas"], certa:2 },
+  /* 66 */ { p:"Pra quem tem 1,90 m, qual é o abraço perfeito?",
+    r:["Com alguém da mesma altura","Com alguém baixinha, que encaixa no peito","Abraço de lado","Ele não gosta de abraço"], certa:1 },
+  /* 67 */ { p:"Por que esse quiz tem exatamente 69 perguntas?",
+    r:["Coincidência","Foi o número que deu","O Markovick gosta de detalhes","Você sabe muito bem 😏"], certa:0 },
+  /* 68 */ { p:"Qual é o jogo dos sonhos que o Markovick está esperando pra jogar?",
+    r:["Cyberpunk 2077","Assassin's Creed Valhalla","Forza Horizon","Guitar Hero","GTA 6"], certa:4, foge:[0,1,2,3] },
+  /* 69 */ { p:"Última pergunta, valendo 1 milhão: quando o GTA 6 chegar, qual vai ser o principal objetivo do Markovick?",
+    r:["Atropelar pedestre na rua","Sair dando rolê de carro","Fugir da polícia","Construir uma vida foda e uma família no GTA 6"], certa:3 }
+];
+
+// Amigas que respondem o post soprando a resposta certa
+const AMIGAS = ["Helena","Giovana"];
+
+// Quantas vezes ela pode usar cada ajuda
+const USOS = { pular:3, cartas:3, amigas:6 };
+
+const MENSAGEM_FINAL =
+`Obrigado por jogar o Show do Markovick! 😄
+
+Independente da pontuação, você já ganhou o prêmio principal: minha atenção.
+
+Agora me manda um print do seu resultado que eu quero ver quanto você me conhece. 😉`;
+/* ======================= FIM DA EDIÇÃO ======================= */
+
+const N = PERGUNTAS.length;
+const PREMIOS = PERGUNTAS.map((_,k)=>{
+  if(k === N-1) return 1000000;
+  const v = 1000 * Math.pow(1000, k/(N-1));
+  const m = Math.pow(10, Math.floor(Math.log10(v)) - 1);
+  return Math.round(v/m)*m;
+});
+
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString("pt-BR");
+const certas = q => [].concat(q.certa);
+const foges = q => q.foge === undefined ? [] : [].concat(q.foge);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let i=0, pontos=0, acertos=0, sel=null, travado=false, mudo=false, fugas=0, ajudas={...USOS};
+
+/* ---------- som ---------- */
+let ctx;
+function tom(freqs, dur=.13, tipo="sine"){
+  if(mudo) return;
+  try{
+    ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,k)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain(), t=ctx.currentTime+k*dur;
+      o.type=tipo; o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,t);
+      g.gain.exponentialRampToValueAtTime(.15,t+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+dur+.05);
+    });
+  }catch(e){}
+}
+const somCerto = ()=>tom([660,880,1320],.1,"triangle");
+const somErrado = ()=>tom([260,190],.22,"square");
+const somClique = ()=>tom([1200],.04,"sine");
+$("som").onclick = ()=>{
+  mudo = !mudo;
+  $("icSom").innerHTML = mudo
+    ? '<path d="M4 9h4l5-4v14l-5-4H4zM17 9l5 6M22 9l-5 6"/>'
+    : '<path d="M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6"/>';
+};
+
+/* ---------- tema ---------- */
+const icLua = '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+const icSol = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function aplicarTema(t){
+  document.documentElement.dataset.tema = t;
+  document.querySelectorAll(".btTema").forEach(b=>b.innerHTML = t==="claro" ? icLua : icSol);
+  try{ localStorage.setItem("tema", t); }catch(e){}
+}
+let temaSalvo = "escuro"; try{ temaSalvo = localStorage.getItem("tema") || "escuro"; }catch(e){}
+aplicarTema(temaSalvo);
+document.querySelectorAll(".btTema").forEach(b=>b.onclick = ()=>{
+  aplicarTema(document.documentElement.dataset.tema==="claro" ? "escuro" : "claro"); somClique();
+});
+
+/* ---------- utilidades ---------- */
+function mostrar(id){
+  document.querySelectorAll(".tela").forEach(t=>t.classList.remove("ativa"));
+  $(id).classList.add("ativa"); window.scrollTo(0,0);
+}
+function toast(msg, erro){
+  const t=$("toast"); t.textContent=msg; t.className="toast show"+(erro?" erro":"");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.className="toast", 2200);
+}
+function placar(){
+  [["placarPts",fmt(pontos)],["placarAc",acertos],["mobPts",fmt(pontos)],["mobAc",acertos],["likeN",fmt(pontos)]]
+    .forEach(([id,v])=>$(id).textContent=v);
+}
+function atualizarAjudas(){
+  const ultima = i === N-1;
+  [["Amigas","amigas"],["Pular","pular"],["Cartas","cartas"]].forEach(([n,k])=>{
+    $("aj"+n).querySelector("span").textContent = ajudas[k];
+    $("aj"+n).classList.toggle("usada", ultima || !ajudas[k]);
+  });
+}
+
+/* ---------- pergunta ---------- */
+function render(){
+  const q = PERGUNTAS[i];
+  sel=null; travado=false; fugas=0;
+  $("enquete").classList.remove("travado");
+  $("status").textContent = `Post ${i+1} de ${N} · Valendo ${fmt(PREMIOS[i])} pontos`;
+  $("mobInfo").textContent = `Post ${i+1}/${N} · ${fmt(PREMIOS[i])} pts`;
+  $("barraProg").style.width = (i/N*100)+"%";
+  $("texto").textContent = q.p;
+  $("infoVotos").textContent = `${fmt(1200 + (i*7919)%8000)} votos · Escolha uma opção`;
+  $("replies").innerHTML = "";
+  $("proxima").hidden = true; $("navProx").style.display = "none";
+
+  $("enquete").innerHTML = q.r.map((t,k)=>
+    `<button class="opc" data-k="${k}"><span class="fill"></span><span class="rot">${esc(t)}</span><span class="pct"></span></button>`).join("");
+
+  document.querySelectorAll(".opc").forEach(el=>{
+    const k = +el.dataset.k;
+    if(foges(q).includes(k)){
+      el.addEventListener("mouseenter", ()=>fugir(el));
+      el.addEventListener("pointerdown", e=>{ e.preventDefault(); fugir(el); });
+      el.addEventListener("click", e=>{ e.preventDefault(); fugir(el); });
+    } else {
+      el.addEventListener("click", ()=>escolher(k));
+    }
+  });
+  atualizarAjudas(); placar();
+}
+
+const frasesFuga = ["Opa! 😅","Essa não","Tenta de novo","Essa opção é tímida","Você sabe a resposta 😏"];
+function fugir(el){
+  const dx = (Math.random()*2-1) * Math.min(window.innerWidth*0.3, 200);
+  const dy = (Math.random()*2-1) * 90;
+  el.style.transform = `translate(${dx}px,${dy}px) scale(${Math.max(.6, 1-fugas*.05)})`;
+  toast(frasesFuga[fugas % frasesFuga.length], true);
+  fugas++; somClique();
+}
+
+function escolher(k){
+  if(travado) return;
+  somClique(); sel = k;
+  document.querySelectorAll(".opc").forEach(el=>el.classList.toggle("marcada", +el.dataset.k===k));
+  abrirModal(`<h2>Confirmar voto?</h2>
+    <p>Você votou em: <b style="color:var(--txt)">${esc(PERGUNTAS[i].r[k])}</b></p>
+    <button class="pill branca" id="mSim">Confirmar</button>
+    <button class="pill contorno" id="mNao">Cancelar</button>`);
+  $("mNao").onclick = ()=>{ fecharModal(); sel=null; document.querySelectorAll(".opc").forEach(el=>el.classList.remove("marcada")); };
+  $("mSim").onclick = ()=>{ fecharModal(); confirmar(); };
+}
+
+function gerarPct(q){
+  const n = q.r.length, c = certas(q)[0], p = Array(n).fill(0);
+  p[c] = 55 + Math.floor(Math.random()*26);
+  let resto = 100 - p[c];
+  const outras = [...Array(n).keys()].filter(k=>k!==c);
+  outras.forEach((k,j)=>{
+    const v = j===outras.length-1 ? resto : Math.floor(Math.random()*(resto+1)*.6);
+    p[k] = v; resto -= v;
+  });
+  return p;
+}
+
+function confirmar(){
+  travado = true;
+  $("enquete").classList.add("travado");
+  const q = PERGUNTAS[i], ok = certas(q).includes(sel), pct = gerarPct(q);
+  $("infoVotos").textContent = "Apurando votos...";
+  setTimeout(()=>{
+    document.querySelectorAll(".opc").forEach(el=>{
+      const k = +el.dataset.k;
+      el.style.transform = "";
+      el.classList.remove("marcada","sumiu");
+      el.classList.add("res");
+      el.querySelector(".pct").textContent = pct[k]+"%";
+      el.querySelector(".fill").style.width = pct[k]+"%";
+      if(certas(q).includes(k)) el.classList.add("certa");
+      if(k===sel && !ok) el.classList.add("errada");
+    });
+    $("infoVotos").textContent = `${fmt(1200 + (i*7919)%8000)} votos · Resultado final`;
+    if(ok){
+      pontos += PREMIOS[i]; acertos++; somCerto();
+      toast(`Certa resposta! +${fmt(PREMIOS[i])} pontos`);
+      $("like").classList.remove("pulo"); void $("like").offsetWidth; $("like").classList.add("pulo");
+    } else {
+      somErrado(); toast("Que pena! Não foi dessa vez", true);
+    }
+    placar();
+    const txt = i === N-1 ? "Ver resultado" : "Próximo post";
+    $("proxima").textContent = txt; $("proxima").hidden = false;
+    $("navProx").textContent = txt; $("navProx").style.display = "";
+  }, 900);
+}
+
+function proxima(){
+  i++;
+  if(i >= N) fim(); else { render(); window.scrollTo({top:0,behavior:"smooth"}); }
+}
+$("proxima").onclick = proxima;
+$("navProx").onclick = proxima;
+
+/* ---------- ajudas ---------- */
+$("ajPular").onclick = ()=>{
+  if(travado || !ajudas.pular) return;
+  ajudas.pular--; somClique(); travado = true;
+  toast("Post pulado");
+  setTimeout(proxima, 500);
+};
+
+$("ajCartas").onclick = ()=>{
+  if(travado || !ajudas.cartas) return;
+  ajudas.cartas--; atualizarAjudas(); somClique();
+  const q = PERGUNTAS[i];
+  const erradas = q.r.map((_,k)=>k).filter(k=>!certas(q).includes(k)).sort(()=>Math.random()-.5).slice(0,2);
+  erradas.forEach(k=>document.querySelector(`.opc[data-k="${k}"]`).classList.add("sumiu"));
+  toast("2 opções erradas cortadas ✂️");
+};
+
+$("ajAmigas").onclick = ()=>{
+  if(travado || !ajudas.amigas || $("replies").innerHTML) return;
+  ajudas.amigas--; atualizarAjudas(); somClique();
+  const q = PERGUNTAS[i], txt = q.r[certas(q)[0]];
+  const ordem = i % 2 ? [...AMIGAS].reverse() : AMIGAS;
+  const falas = ["Vai de","Confia em mim, é","Nem pensa, marca","Tenho certeza que é"];
+  $("replies").innerHTML = ordem.map((n,k)=>`
+    <article class="post reply" style="animation-delay:${k*.45}s">
+      <div class="av a${AMIGAS.indexOf(n)}">${esc(n[0])}</div>
+      <div class="corpo">
+        <div class="cab"><b>${esc(n)}</b><span class="cinza">@${esc(n.toLowerCase())} · agora</span></div>
+        <div class="cinza peq">Respondendo a <span class="azul">@markovick</span></div>
+        <div class="texto">${falas[(i+k)%falas.length]} “${esc(txt)}” 👀</div>
+      </div>
+    </article>`).join("");
+};
+
+/* ---------- modal ---------- */
+function abrirModal(html){ $("caixa").innerHTML = html; $("modal").classList.add("ativa"); }
+function fecharModal(){ $("modal").classList.remove("ativa"); }
+
+/* ---------- fim ---------- */
+function fim(){
+  mostrar("telaFim");
+  $("tituloFim").textContent =
+    acertos === N ? "Você me conhece demais! 🏆" :
+    acertos >= N*.7 ? "Mandou muito bem! 🔥" :
+    acertos >= N*.4 ? "Tá no caminho certo 😄" : "Precisamos conversar mais 😂";
+  $("acFim").textContent = acertos; $("totFim").textContent = N;
+  $("mensagemFim").textContent = MENSAGEM_FINAL;
+  let n = 0; const passo = Math.max(1, Math.ceil(pontos/60));
+  const t = setInterval(()=>{
+    n = Math.min(pontos, n+passo); $("ptsFim").textContent = fmt(n);
+    if(n >= pontos) clearInterval(t);
+  }, 25);
+  somCerto(); confete();
+}
+function confete(){
+  const cores = ["#1d9bf0","#f91880","#00ba7c","#ffd400","#7856ff","#ffffff"];
+  for(let k=0;k<110;k++){
+    const c = document.createElement("div");
+    c.className = "confete";
+    c.style.left = Math.random()*100+"vw";
+    c.style.background = cores[k%cores.length];
+    c.style.animationDuration = (2.5+Math.random()*2.5)+"s";
+    c.style.animationDelay = Math.random()*1.5+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 6500);
+  }
+}
+
+/* ---------- iniciar ---------- */
+function comecar(){
+  i=0; pontos=0; acertos=0; ajudas={...USOS};
+  mostrar("telaJogo"); render();
+}
+$("btnComecar").onclick = ()=>{ somClique(); comecar(); };
+$("btnDeNovo").onclick = ()=>{ somClique(); comecar(); };
+</script>
+</body>
+</html>
